@@ -20,6 +20,7 @@ import {SignupComponent} from './auth/signup/signup.component';
 import {WelcomeComponent} from './welcome/welcome.component';
 import {LoginComponent} from './auth/login/login.component';
 import {AppComponent} from './app.component';
+import {TrainingService} from './training/training.service';
 
 @NgModule({
   declarations: [
@@ -45,7 +46,7 @@ import {AppComponent} from './app.component';
     ReactiveFormsModule,
     BrowserAnimationsModule
   ],
-  providers: [AuthService],
+  providers: [AuthService, TrainingService],
   bootstrap: [AppComponent]
 })
 export class AppModule {}
