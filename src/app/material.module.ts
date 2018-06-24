@@ -9,7 +9,7 @@ import {
   MatIconModule,
   MatInputModule,
   MatListModule,
-  MatNativeDateModule,
+  MatNativeDateModule, MatPaginatorModule,
   MatProgressSpinnerModule,
   MatSelectModule,
   MatSidenavModule,
@@ -34,6 +34,7 @@ const matModules = [
   MatToolbarModule,
   MatCheckboxModule,
   MatFormFieldModule,
+  MatPaginatorModule,
   MatDatepickerModule,
   MatNativeDateModule,
   MatProgressSpinnerModule

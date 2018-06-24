@@ -1,8 +1,12 @@
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
+import {AngularFirestoreModule} from 'angularfire2/firestore';
 import {BrowserModule} from '@angular/platform-browser';
 import {FlexLayoutModule} from '@angular/flex-layout';
+import {AngularFireModule} from 'angularfire2';
 import {NgModule} from '@angular/core';
+
+import {environment} from '../environments/environment';
 
 import {AppRoutingModule} from './app-routing.module';
 import {MaterialModule} from './material.module';
@@ -44,7 +48,9 @@ import {TrainingService} from './training/training.service';
     FlexLayoutModule,
     AppRoutingModule,
     ReactiveFormsModule,
-    BrowserAnimationsModule
+    AngularFirestoreModule,
+    BrowserAnimationsModule,
+    AngularFireModule.initializeApp(environment.firebase)
   ],
   providers: [AuthService, TrainingService],
   bootstrap: [AppComponent]
