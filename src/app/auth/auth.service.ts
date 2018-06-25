@@ -1,49 +1,60 @@
-import { Injectable } from '@angular/core';
+import {AngularFireAuth} from 'angularfire2/auth';
+import {MatSnackBar} from '@angular/material';
+import {Injectable} from '@angular/core';
 import {Router} from '@angular/router';
 import {Subject} from 'rxjs';
 
 import {AuthData} from './auth-data.model';
-import {User} from './user.model';
+import {TrainingService} from '../training/training.service';
 
 @Injectable()
 export class AuthService {
   authChange = new Subject<boolean>();
-  private user: User;
+  private isAuthenticated = false;
 
-  constructor(private _router: Router) {}
+  constructor(
+    private _router: Router,
+    private _authenticator: AngularFireAuth,
+    private _trainingService: TrainingService,
+    private _snackBar: MatSnackBar
+  ) {}
+
+  initAuthListener() {
+    this._authenticator.authState.subscribe(user => {
+      if (user) {
+        this.authChange.next(true);
+        this._router.navigate(['/training']);
+        this.isAuthenticated = true;
+      } else {
+        this._trainingService.cancelSubscriptions();
+        this.authChange.next(false);
+        this._router.navigate(['/login']);
+        this.isAuthenticated = false;
+      }
+    });
+  }
 
   registerUser(authData: AuthData) {
-    this.user = {
-      email: authData.email,
-      userId: Math.round(Math.random() * 10000).toString()
-    };
-    this.authSuccessfully();
+    this._authenticator.auth.createUserWithEmailAndPassword(authData.email, authData.password)
+      .then(() => console.log('registration'))
+      .catch(({message}) => this.handleError(message));
   }
 
   login(authData: AuthData) {
-    this.user = {
-      email: authData.email,
-      userId: Math.round(Math.random() * 10000).toString()
-    };
-    this.authSuccessfully();
+    this._authenticator.auth.signInWithEmailAndPassword(authData.email, authData.password)
+      .then(() => console.log('login'))
+      .catch(({message}) => this.handleError(message));
   }
 
   logout() {
-    this.user = null;
-    this.authChange.next(false);
-    this._router.navigate(['/login']);
-  }
-
-  getUser() {
-    return {...this.user};
+    this._authenticator.auth.signOut();
   }
 
   isAuth() {
-    return this.user != null;
+    return this.isAuthenticated;
   }
 
-  private authSuccessfully() {
-    this.authChange.next(true);
-    this._router.navigate(['/training']);
+  handleError(message) {
+    this._snackBar.open(message, null, {duration: 3000});
   }
 }

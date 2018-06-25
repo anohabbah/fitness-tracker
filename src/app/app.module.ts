@@ -1,6 +1,7 @@
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {AngularFirestoreModule} from 'angularfire2/firestore';
+import {AngularFireAuthModule} from 'angularfire2/auth';
 import {BrowserModule} from '@angular/platform-browser';
 import {FlexLayoutModule} from '@angular/flex-layout';
 import {AngularFireModule} from 'angularfire2';
@@ -48,6 +49,7 @@ import {TrainingService} from './training/training.service';
     FlexLayoutModule,
     AppRoutingModule,
     ReactiveFormsModule,
+    AngularFireAuthModule,
     AngularFirestoreModule,
     BrowserAnimationsModule,
     AngularFireModule.initializeApp(environment.firebase)

@@ -1,6 +1,6 @@
 <div fxLayoutAlign="center center">
   <mat-form-field fxFlex="40%">
-    <input type="text" matInput placeholder="Filter" (keyup)="$event.target.value">
+    <input type="text" matInput placeholder="Filter" (keyup)="doFilter($event.target.value)">
   </mat-form-field>
 </div>
 
