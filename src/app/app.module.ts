@@ -3,6 +3,7 @@ import {AngularFirestoreModule} from 'angularfire2/firestore';
 import {BrowserModule} from '@angular/platform-browser';
 import {FlexLayoutModule} from '@angular/flex-layout';
 import {AngularFireModule} from 'angularfire2';
+import {StoreModule} from '@ngrx/store';
 import {NgModule} from '@angular/core';
 
 import {environment} from '../environments/environment';
@@ -17,6 +18,8 @@ import {SidenavListComponent} from './navigation/sidenav-list/sidenav-list.compo
 import {HeaderComponent} from './navigation/header/header.component';
 import {WelcomeComponent} from './welcome/welcome.component';
 import {AppComponent} from './app.component';
+
+import {reducers} from './app.reducer';
 
 @NgModule({
   declarations: [
@@ -34,6 +37,7 @@ import {AppComponent} from './app.component';
     AngularFireModule.initializeApp(environment.firebase),
     AuthModule,
     AngularFirestoreModule,
+    StoreModule.forRoot(reducers)
   ],
   providers: [AuthService, TrainingService, UiService],
   bootstrap: [AppComponent]

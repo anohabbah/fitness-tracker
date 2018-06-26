@@ -4,6 +4,10 @@ import {Subject, Subscription} from 'rxjs';
 import {map} from 'rxjs/operators';
 import {AngularFirestore} from 'angularfire2/firestore';
 import {UiService} from '../shared/ui.service';
+import {Store} from '@ngrx/store';
+
+import * as fromRoot from '../app.reducer';
+import * as UI from '../shared/ui.actions';
 
 @Injectable()
 export class TrainingService {
@@ -17,11 +21,10 @@ export class TrainingService {
 
   private runningExercise: Exercise;
 
-  constructor(private _db: AngularFirestore, private _uiService: UiService) {
-  }
+  constructor(private _db: AngularFirestore, private _uiService: UiService, private _store: Store<fromRoot.State>) {}
 
   fetchAvailableExercises() {
-    this._uiService.loadingStateChanged.next(true);
+    this._store.dispatch(new UI.StartLoading());
     this.fbSubs.push(this._db.collection('availableExercises').snapshotChanges()
       .pipe(
         map(docArray => {
@@ -36,12 +39,12 @@ export class TrainingService {
         })
       ).subscribe(
         (exercises: Exercise[]) => {
-          this._uiService.loadingStateChanged.next(false);
+          this._store.dispatch(new UI.StopLoading());
           this.availableExercises = exercises;
           this.exercisesChanged.next([...this.availableExercises]);
         },
         error => {
-          this._uiService.loadingStateChanged.next(false);
+          this._store.dispatch(new UI.StopLoading());
           this.availableExercises = null;
           this.exerciseChanged.next(null);
           this._uiService.showSnackBar('Exercises Fetching failed. Please try again later.', null, 3000);
