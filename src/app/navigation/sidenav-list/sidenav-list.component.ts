@@ -1,5 +1,8 @@
-import {Component, OnDestroy, OnInit} from '@angular/core';
-import {Subscription} from 'rxjs';
+import {Component, OnInit} from '@angular/core';
+import {Observable} from 'rxjs';
+import {Store} from '@ngrx/store';
+
+import * as fromRoot from '../../auth/auth.reducer';
 import {AuthService} from '../../auth/auth.service';
 
 @Component({
@@ -7,18 +10,13 @@ import {AuthService} from '../../auth/auth.service';
   templateUrl: './sidenav-list.component.html',
   styleUrls: ['./sidenav-list.component.css']
 })
-export class SidenavListComponent implements OnInit, OnDestroy{
-  isAuth = false;
-  authSubscription: Subscription;
+export class SidenavListComponent implements OnInit {
+  isAuth$: Observable<boolean>;
 
-  constructor(private _authService: AuthService) {}
+  constructor(private _authService: AuthService, private _store: Store<fromRoot.State>) {}
 
   ngOnInit() {
-    this.authSubscription = this._authService.authChange.subscribe(authStatus => this.isAuth = authStatus);
-  }
-
-  ngOnDestroy(): void {
-    this.authSubscription.unsubscribe();
+    this.isAuth$ = this._store.select(fromRoot.getIsAuthenticated);
   }
 
   onLogout() {
