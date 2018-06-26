@@ -6,6 +6,7 @@ import {Subject} from 'rxjs';
 
 import {AuthData} from './auth-data.model';
 import {TrainingService} from '../training/training.service';
+import {UiService} from '../shared/ui.service';
 
 @Injectable()
 export class AuthService {
@@ -16,7 +17,8 @@ export class AuthService {
     private _router: Router,
     private _authenticator: AngularFireAuth,
     private _trainingService: TrainingService,
-    private _snackBar: MatSnackBar
+    private _snackBar: MatSnackBar,
+    private _uiService: UiService
   ) {}
 
   initAuthListener() {
@@ -35,15 +37,23 @@ export class AuthService {
   }
 
   registerUser(authData: AuthData) {
+    this._uiService.loadingStateChanged.next(true);
     this._authenticator.auth.createUserWithEmailAndPassword(authData.email, authData.password)
-      .then(() => console.log('registration'))
-      .catch(({message}) => this.handleError(message));
+      .then(() =>     this._uiService.loadingStateChanged.next(false))
+      .catch(({message}) => {
+        this._uiService.loadingStateChanged.next(false);
+        this._uiService.showSnackBar(message, null, 3000);
+      });
   }
 
   login(authData: AuthData) {
+    this._uiService.loadingStateChanged.next(true);
     this._authenticator.auth.signInWithEmailAndPassword(authData.email, authData.password)
-      .then(() => console.log('login'))
-      .catch(({message}) => this.handleError(message));
+      .then(() =>     this._uiService.loadingStateChanged.next(false))
+      .catch(({message}) => {
+        this._uiService.loadingStateChanged.next(false);
+        this._uiService.showSnackBar(message, null, 3000);
+      });
   }
 
   logout() {
@@ -52,9 +62,5 @@ export class AuthService {
 
   isAuth() {
     return this.isAuthenticated;
-  }
-
-  handleError(message) {
-    this._snackBar.open(message, null, {duration: 3000});
   }
 }

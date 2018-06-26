@@ -3,6 +3,7 @@ import {Exercise} from './exercise.model';
 import {Subject, Subscription} from 'rxjs';
 import {map} from 'rxjs/operators';
 import {AngularFirestore} from 'angularfire2/firestore';
+import {UiService} from '../shared/ui.service';
 
 @Injectable()
 export class TrainingService {
@@ -16,10 +17,11 @@ export class TrainingService {
 
   private runningExercise: Exercise;
 
-  constructor(private _db: AngularFirestore) {
+  constructor(private _db: AngularFirestore, private _uiService: UiService) {
   }
 
   fetchAvailableExercises() {
+    this._uiService.loadingStateChanged.next(true);
     this.fbSubs.push(this._db.collection('availableExercises').snapshotChanges()
       .pipe(
         map(docArray => {
@@ -32,19 +34,28 @@ export class TrainingService {
             };
           });
         })
-      ).subscribe((exercises: Exercise[]) => {
-        this.availableExercises = exercises;
-        this.exercisesChanged.next([...this.availableExercises]);
-      }));
+      ).subscribe(
+        (exercises: Exercise[]) => {
+          this._uiService.loadingStateChanged.next(false);
+          this.availableExercises = exercises;
+          this.exercisesChanged.next([...this.availableExercises]);
+        },
+        error => {
+          this._uiService.loadingStateChanged.next(false);
+          this.availableExercises = null;
+          this.exerciseChanged.next(null);
+          this._uiService.showSnackBar('Exercises Fetching failed. Please try again later.', null, 3000);
+        }
+      ));
   }
 
   startExercise(selectedId: string) {
     this.runningExercise = this.availableExercises.find(ex => ex.id === selectedId);
-    this.exerciseChanged.next({...this.runningExercise});
+    this.exerciseChanged.next(Object.assign({}, this.runningExercise));
   }
 
   completeExercise() {
-    this.addDataToDatabase({...this.runningExercise, date: new Date(), state: 'completed'});
+    this.addDataToDatabase(Object.assign({}, this.runningExercise, {date: new Date(), state: 'completed'}));
     this.runningExercise = null;
     this.exerciseChanged.next(null);
   }
